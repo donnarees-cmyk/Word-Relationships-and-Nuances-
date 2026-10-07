@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Florida B.E.S.T. ELA.6.V.1.3 - Word Relationships & Nuances Lab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --accent-cyan: #06b6d4;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .word-highlight {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-weight: 600;
+    }
+
+    .word-neg {
+      background: rgba(244, 63, 94, 0.2);
+      border-bottom: 2px solid var(--accent-rose);
+      color: #fca5a5;
+    }
+
+    .word-neu {
+      background: rgba(245, 158, 11, 0.2);
+      border-bottom: 2px solid var(--accent-amber);
+      color: #fef08a;
+    }
+
+    .word-pos {
+      background: rgba(16, 185, 129, 0.2);
+      border-bottom: 2px solid var(--accent-emerald);
+      color: #6ee7b7;
+    }
+
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background-color: var(--bg-card-hover);
+      border-color: var(--accent-cyan);
+    }
+
+    .option-btn.correct {
+      background-color: rgba(16, 185, 129, 0.2) !important;
+      border-color: var(--accent-emerald) !important;
+      color: #6ee7b7 !important;
+    }
+
+    .option-btn.incorrect {
+      background-color: rgba(244, 63, 94, 0.2) !important;
+      border-color: var(--accent-rose) !important;
+      color: #fca5a5 !important;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+  <header class="max-w-7xl mx-auto bg-gradient-to-r from-emerald-800 via-teal-700 to-cyan-800 p-6 rounded-2xl mb-8 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-emerald-500/30">
+    <div>
+      <span class="inline-block bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2 border border-white/30">
+        Florida B.E.S.T. Standard ELA.6.V.1.3
+      </span>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Word Relationships & Nuances Lab</h1>
+      <p class="text-emerald-100 text-sm md:text-base mt-1">Analyze connotations, intensity, and subtle shades of word meaning in literary text</p>
+    </div>
+    <div class="bg-black/30 backdrop-blur-sm p-3 rounded-xl border border-white/10 text-left md:text-right w-full md:w-auto">
+      <div class="text-xs text-emerald-200 uppercase font-semibold">Target Benchmark</div>
+      <div class="font-bold text-sm md:text-base text-white">ELA.6.V.1.3 Nuances & Word Relationships</div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+    
+    <!-- LEFT COLUMN: Connotation Visualizer & Interactive Passage -->
+    <div class="flex flex-col gap-6">
+      
+      <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center gap-3 border-b border-slate-700 pb-3 mb-4">
+          <span class="text-2xl">🌡️</span>
+          <h2 class="text-lg font-bold text-white">Connotation Thermometer & Spectrum Visualizer</h2>
+        </div>
+
+        <div class="relative w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-700">
+          <canvas id="spectrumCanvas" width="600" height="260" class="w-full h-auto block"></canvas>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-3 bg-slate-900 p-3 rounded-xl mt-4 border border-slate-800">
+          <button id="playBtn" onclick="togglePlay()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2">
+            Scan Spectrum
+          </button>
+          <div class="flex-1 h-2 bg-slate-700 rounded-full cursor-pointer relative overflow-hidden" onclick="seekSpectrum(event)">
+            <div id="progressFill" class="h-full w-0 bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-400 rounded-full transition-all duration-100"></div>
+          </div>
+          <span id="spectrumStatus" class="font-mono text-xs text-slate-400 min-w-[70px] text-right">Negative</span>
+        </div>
+
+        <!-- Spectrum Presets -->
+        <div class="flex gap-2 mt-3 overflow-x-auto pb-1 text-xs">
+          <button onclick="setSpectrumSet(0)" class="spec-btn px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600 font-semibold whitespace-nowrap hover:border-emerald-400">Cheap ↔ Frugal</button>
+          <button onclick="setSpectrumSet(1)" class="spec-btn px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600 font-semibold whitespace-nowrap hover:border-emerald-400">Stubborn ↔ Steadfast</button>
+          <button onclick="setSpectrumSet(2)" class="spec-btn px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600 font-semibold whitespace-nowrap hover:border-emerald-400">Nosy ↔ Inquisitive</button>
+          <button onclick="setSpectrumSet(3)" class="spec-btn px-3 py-1.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600 font-semibold whitespace-nowrap hover:border-emerald-400">Staring ↔ Gazing</button>
+        </div>
+      </section>
+
+      <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center gap-3 border-b border-slate-700 pb-3 mb-3">
+          <span class="text-2xl">🔎</span>
+          <h2 class="text-lg font-bold text-white">Passage: "The Antique Collector"</h2>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">
+          Click on any highlighted target word to reveal its connotation, shade of meaning, and impact on tone.
+        </p>
+
+        <div class="bg-slate-900 p-4 rounded-xl border-l-4 border-emerald-500 max-h-96 overflow-y-auto space-y-4 text-sm leading-relaxed text-slate-300">
+          <p>
+            Old Mr. Vance was known throughout the town as a 
+            <span onclick="explainWord('frugal')" class="word-highlight word-pos">frugal</span> buyer. While some shop owners called him 
+            <span onclick="explainWord('stingy')" class="word-highlight word-neg">stingy</span> behind his back, his friends insisted he was merely 
+            <span onclick="explainWord('thrifty')" class="word-highlight word-neu">thrifty</span> with his savings.
+          </p>
+
+          <p>
+            Inside his workshop, he inspected every artifact with a 
+            <span onclick="explainWord('scrutinizing')" class="word-highlight word-neg">scrutinizing</span> eye. Where an amateur might give a quick glance, Vance remained 
+            <span onclick="explainWord('inquisitive')" class="word-highlight word-pos">inquisitive</span>, asking endless questions about an item's origin without seeming 
+            <span onclick="explainWord('nosy')" class="word-highlight word-neg">nosy</span>.
+          </p>
+
+          <p>
+            When negotiating prices, he was remarkably 
+            <span onclick="explainWord('steadfast')" class="word-highlight word-pos">steadfast</span> in his offers. Sellers who didn't understand him considered him 
+            <span onclick="explainWord('stubborn')" class="word-highlight word-neg">stubborn</span>, but Vance simply respected the true value of craftsmanship.
+          </p>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Nuance Matrix & B.E.S.T. Assessment Quiz -->
+    <div class="flex flex-col gap-6">
+
+      <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center gap-3 border-b border-slate-700 pb-3 mb-4">
+          <span class="text-2xl">📖</span>
+          <h2 class="text-lg font-bold text-white">Word Nuance Reference Matrix</h2>
+        </div>
+
+        <div class="space-y-3">
+          
+          <div class="bg-slate-700/50 p-3.5 rounded-xl border-l-4 border-rose-400 text-xs md:text-sm">
+            <h3 class="font-bold text-rose-400 uppercase tracking-wider text-xs mb-1">Negative Connotation</h3>
+            <p><strong class="text-slate-200">Definition:</strong> Words that carry an unfavorable or critical emotional association.</p>
+            <p><strong class="text-slate-200">Examples:</strong> <em>Stingy</em> (unwilling to share), <em>Nosy</em> (prying inappropriately), <em>Stubborn</em> (unreasonably unyielding).</p>
+          </div>
+
+          <div class="bg-slate-700/50 p-3.5 rounded-xl border-l-4 border-amber-400 text-xs md:text-sm">
+            <h3 class="font-bold text-amber-400 uppercase tracking-wider text-xs mb-1">Neutral Denotation</h3>
+            <p><strong class="text-slate-200">Definition:</strong> The literal, dictionary definition of a word without emotional bias.</p>
+            <p><strong class="text-slate-200">Examples:</strong> <em>Inexpensive</em> (low cost), <em>Curious</em> (eager to learn), <em>Persistent</em> (continuing firmly).</p>
+          </div>
+
+          <div class="bg-slate-700/50 p-3.5 rounded-xl border-l-4 border-emerald-400 text-xs md:text-sm">
+            <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-xs mb-1">Positive Connotation</h3>
+            <p><strong class="text-slate-200">Definition:</strong> Words that evoke favorable, admiring, or respectful emotional associations.</p>
+            <p><strong class="text-slate-200">Examples:</strong> <em>Frugal / Thrifty</em> (wise with money), <em>Inquisitive</em> (intellectually curious), <em>Steadfast</em> (loyal & firm).</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg flex-1 flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center bg-slate-700/60 p-3 rounded-xl mb-4 border border-slate-600">
+            <span class="font-bold text-sm text-white">Florida B.E.S.T. Assessment Practice</span>
+            <span id="scoreDisplay" class="bg-emerald-500 text-slate-950 font-bold px-3 py-1 rounded-full text-xs">Score: 0 / 8</span>
+          </div>
+
+          <div id="quizContainer">
+            <!-- Questions dynamically injected -->
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center gap-3 mt-6 pt-3 border-t border-slate-700">
+          <button id="prevBtn" onclick="navigateQuiz(-1)" class="bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all" disabled>
+            Previous
+          </button>
+          <span id="quizProgress" class="text-xs text-slate-400 font-medium">Question 1 of 8</span>
+          <button id="nextBtn" onclick="navigateQuiz(1)" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all">
+            Next Question
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Explanation Modal Display -->
+  <div id="infoModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-600 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <h3 id="modalTitle" class="text-lg font-bold text-emerald-400 mb-2">Word Nuance Breakdown</h3>
+      <p id="modalBody" class="text-sm text-slate-200 leading-relaxed mb-6"></p>
+      <button onclick="closeModal()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2 rounded-lg text-sm transition-all">
+        Got it!
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('spectrumCanvas');
+    const ctx = canvas.getContext('2d');
+    let scanPos = 0; // 0 (Neg) to 100 (Pos)
+    let isScanning = false;
+    let animInterval = null;
+    let currentSetIdx = 0;
+
+    const spectrumSets = [
+      { neg: "Cheap", neu: "Inexpensive", pos: "Frugal", desc: "Negative vs. Neutral vs. Admirable attitude toward money" },
+      { neg: "Stubborn", neu: "Persistent", pos: "Steadfast", desc: "Unreasonable vs. Standard vs. Heroic determination" },
+      { neg: "Nosy", neu: "Curious", pos: "Inquisitive", desc: "Prying inappropriately vs. General interest vs. Intellectual desire" },
+      { neg: "Staring", neu: "Looking", pos: "Gazing", desc: "Uncomfortable/Rude vs. Neutral observation vs. Admiring wonder" }
+    ];
+
+    function drawSpectrum() {
+      // Background
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const set = spectrumSets[currentSetIdx];
+
+      // Spectrum Line
+      const grad = ctx.createLinearGradient(50, 0, 550, 0);
+      grad.addColorStop(0, '#f43f5e'); // Negative
+      grad.addColorStop(0.5, '#f59e0b'); // Neutral
+      grad.addColorStop(1, '#10b981'); // Positive
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(50, 120, 500, 16);
+
+      // Node Circles
+      const nodes = [
+        { x: 50, label: set.neg, sub: "Negative Connotation", color: "#f43f5e" },
+        { x: 300, label: set.neu, sub: "Neutral Denotation", color: "#f59e0b" },
+        { x: 550, label: set.pos, sub: "Positive Connotation", color: "#10b981" }
+      ];
+
+      nodes.forEach(n => {
+        ctx.beginPath();
+        ctx.arc(n.x, 128, 14, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#0f172a';
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label, n.x, 85);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px system-ui';
+        ctx.fillText(n.sub, n.x, 65);
+      });
+
+      // Scanner indicator
+      const currentX = 50 + (scanPos / 100) * 500;
+      ctx.beginPath();
+      ctx.arc(currentX, 128, 20, 0, Math.PI * 2);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Category display box
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(50, 175, 500, 60);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(50, 175, 500, 60);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 13px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(set.desc, 300, 200);
+
+      let statusText = "Negative Connotation";
+      let statusColor = "#f43f5e";
+      if (scanPos > 33 && scanPos < 66) {
+        statusText = "Neutral Denotation";
+        statusColor = "#f59e0b";
+      } else if (scanPos >= 66) {
+        statusText = "Positive Connotation";
+        statusColor = "#10b981";
+      }
+
+      ctx.fillStyle = statusColor;
+      ctx.font = 'bold 12px system-ui';
+      ctx.fillText(`Current Point: ${statusText}`, 300, 220);
+
+      document.getElementById('spectrumStatus').innerText = statusText.split(' ')[0];
+      document.getElementById('spectrumStatus').style.color = statusColor;
+    }
+
+    function togglePlay() {
+      isScanning = !isScanning;
+      document.getElementById('playBtn').innerText = isScanning ? 'Pause Scan' : 'Scan Spectrum';
+      if (isScanning) {
+        animInterval = setInterval(() => {
+          scanPos += 1;
+          if (scanPos > 100) scanPos = 0;
+          updateSpectrumUI();
+        }, 50);
+      } else {
+        clearInterval(animInterval);
+      }
+    }
+
+    function setSpectrumSet(idx) {
+      currentSetIdx = idx;
+      scanPos = 0;
+      updateSpectrumUI();
+    }
+
+    function seekSpectrum(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      scanPos = pos * 100;
+      updateSpectrumUI();
+    }
+
+    function updateSpectrumUI() {
+      document.getElementById('progressFill').style.width = `${scanPos}%`;
+      drawSpectrum();
+    }
+
+    window.onload = function() {
+      drawSpectrum();
+    };
+
+    function explainWord(word) {
+      const wordMap = {
+        frugal: { title: "Frugal (Positive Connotation)", body: "Means wise and careful with spending money. It implies intelligence, restraint, and good financial stewardship." },
+        stingy: { title: "Stingy (Negative Connotation)", body: "Means unwilling to spend or give money. It implies selfishness, greed, and unpleasant behavior toward others." },
+        thrifty: { title: "Thrifty (Neutral / Positive)", body: "Means managing money efficiently without wasteful spending. It focuses objectively on practical management." },
+        scrutinizing: { title: "Scrutinizing (Intense / Negative)", body: "Means inspecting with extreme, critical closeness. It suggests searching for flaws or suspicion rather than just looking." },
+        inquisitive: { title: "Inquisitive (Positive Connotation)", body: "Means eager for knowledge and intellectually curious. It presents asking questions as an admirable pursuit." },
+        nosy: { title: "Nosy (Negative Connotation)", body: "Means overly pryingly interested in other people's private business. It creates an invasive character portrayal." },
+        steadfast: { title: "Steadfast (Positive Connotation)", body: "Means resolutely firm and unwavering in loyalty or purpose. It frames stubbornness as a noble virtue." },
+        stubborn: { title: "Stubborn (Negative Connotation)", body: "Means unreasonably refusing to change one's mind or posture, even when presented with good reasons." }
+      };
+
+      const data = wordMap[word];
+      if (data) {
+        document.getElementById('modalTitle').innerText = data.title;
+        document.getElementById('modalBody').innerText = data.body;
+        document.getElementById('infoModal').classList.remove('hidden');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('infoModal').classList.add('hidden');
+    }
+
+    const quizData = [
+      {
+        id: 1,
+        question: "How does replacing the word 'stingy' with 'frugal' change the reader's view of Mr. Vance?",
+        options: [
+          "A. It changes his portrayal from a selfish man to a wise, careful manager of money.",
+          "B. It makes him seem much richer than he actually is.",
+          "C. It suggests that he does not care about the quality of antiques.",
+          "D. It shifts the setting of the story from a small shop to a large city."
+        ],
+        correct: 0,
+        rationale: "Correct! Standard ELA.6.V.1.3 tests nuances and connotations. 'Stingy' carries a negative connotation of selfishness, whereas 'frugal' carries a positive connotation of financial wisdom."
+      },
+      {
+        id: 2,
+        question: "This question has two parts. First, answer Part A. Then, answer Part B.\n\nPart A: What shade of meaning is conveyed by describing Mr. Vance as 'inquisitive' rather than 'nosy'?",
+        options: [
+          "A. He is prying into secrets that do not concern him.",
+          "B. He possesses an admirable, intellectual curiosity about history.",
+          "C. He is confusing sellers with fake questions.",
+          "D. He is eager to quickly buy items without checking their background."
+        ],
+        correct: 1,
+        rationale: "Correct! 'Inquisitive' emphasizes a positive, intellectual desire to learn, while 'nosy' carries a negative connotation of inappropriate prying."
+      },
+      {
+        id: 3,
+        question: "Part B: Which detail from the passage best supports the positive connotation of 'inquisitive' in Part A?",
+        options: [
+          "A. 'While some shop owners called him stingy behind his back...'",
+          "B. '...asking endless questions about an item's origin without seeming nosy.'",
+          "C. 'Sellers who didn't understand him considered him stubborn...'",
+          "D. 'Inside his workshop, he inspected every artifact...'"
+        ],
+        correct: 1,
+        rationale: "Correct! Clarifying that he asked about origin 'without seeming nosy' highlights his legitimate historical interest rather than personal prying."
+      },
+      {
+        id: 4,
+        question: "Which list of words correctly orders shades of meaning from LEAST intense to MOST intense critical observation?",
+        options: [
+          "A. Scrutinizing → Glancing → Looking",
+          "B. Looking → Examining → Scrutinizing",
+          "C. Scrutinizing → Looking → Examining",
+          "D. Examining → Looking → Scrutinizing"
+        ],
+        correct: 1,
+        rationale: "Correct! 'Looking' is a general neutral action; 'examining' adds intentional inspection; 'scrutinizing' is the most intense, critical level of close inspection."
+      },
+      {
+        id: 5,
+        question: "Why did the author choose the word 'steadfast' instead of 'stubborn' when describing Vance's price negotiation?",
+        options: [
+          "A. To show that Vance was easily tricked by other sellers.",
+          "B. To honor his firm principle and respect for genuine craftsmanship.",
+          "C. To indicate that Vance changed his mind frequently.",
+          "D. To prove that Vance was unfair to the people in town."
+        ],
+        correct: 1,
+        rationale: "Correct! 'Steadfast' carries a positive connotation of honorable, loyal firmness, contrasting with the negative connotation of 'stubborn'."
+      },
+      {
+        id: 6,
+        question: "Select the sentence where the highlighted word carries a NEGATIVE connotation.",
+        options: [
+          "A. She was an economical shopper who clipped coupons every week.",
+          "B. The cheap material tore as soon as he opened the package.",
+          "C. He maintained an inexpensive collection of rare coins.",
+          "D. Their thrifty habits allowed them to save for college."
+        ],
+        correct: 1,
+        rationale: "Correct! 'Cheap' carries a negative connotation implying poor, flimsy quality, whereas 'economical', 'inexpensive', and 'thrifty' are neutral or positive."
+      },
+      {
+        id: 7,
+        question: "Read the pair of words: (gazing / staring). What is the difference in connotation between these two synonyms?",
+        options: [
+          "A. 'Gazing' implies admiration or wonder, while 'staring' can feel uncomfortable or rude.",
+          "B. 'Staring' is always positive, while 'gazing' is always negative.",
+          "C. Both words have the exact same denotation and connotation.",
+          "D. 'Gazing' describes looking at small objects, while 'staring' describes looking at large buildings."
+        ],
+        correct: 0,
+        rationale: "Correct! While both share the denotation of looking intently, 'gazing' suggests warmth or wonder, whereas 'staring' often implies rudeness or intensity."
+      },
+      {
+        id: 8,
+        question: "What overall tone does the author establish by selecting positive-nuance words like 'frugal', 'inquisitive', and 'steadfast' to describe Mr. Vance?",
+        options: [
+          "A. Mocking and sarcastic",
+          "B. Respectful and appreciative",
+          "C. Fearful and anxious",
+          "D. Cold and indifferent"
+        ],
+        correct: 1,
+        rationale: "Correct! By deliberately using words with positive connotations, the author conveys respect for Mr. Vance's dedication and skill."
+      }
+    ];
+
+    let currentQuestionIdx = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    function renderQuestion(idx) {
+      const q = quizData[idx];
+      const container = document.getElementById('quizContainer');
+      
+      let optionsHTML = q.options.map((opt, oIdx) => {
+        let btnClass = 'option-btn w-full text-left bg-slate-900 border border-slate-700 p-3 rounded-lg text-xs md:text-sm text-slate-200';
+        if (userAnswers[idx] !== null) {
+          if (oIdx === q.correct) btnClass += ' correct';
+          else if (oIdx === userAnswers[idx]) btnClass += ' incorrect';
+        }
+        return `<button class="${btnClass}" onclick="selectAnswer(${idx}, ${oIdx})" ${userAnswers[idx] !== null ? 'disabled' : ''}>${opt}</button>`;
+      }).join('');
+
+      let rationaleHTML = '';
+      if (userAnswers[idx] !== null) {
+        const isCorrect = userAnswers[idx] === q.correct;
+        const boxStyle = isCorrect ? 'bg-emerald-950/60 border-emerald-500 text-emerald-200' : 'bg-rose-950/60 border-rose-500 text-rose-200';
+        rationaleHTML = `
+          <div class="mt-4 p-3 rounded-lg border text-xs leading-relaxed ${boxStyle}">
+            ${q.rationale}
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="bg-slate-900/80 border border-slate-700/80 rounded-xl p-4">
+          <div class="text-xs md:text-sm font-semibold text-slate-100 mb-3">${q.question.replace(/\n/g, '<br>')}</div>
+          <div class="space-y-2">${optionsHTML}</div>
+          ${rationaleHTML}
+        </div>
+      `;
+
+      document.getElementById('prevBtn').disabled = idx === 0;
+      document.getElementById('nextBtn').disabled = idx === quizData.length - 1;
+      document.getElementById('quizProgress').innerText = `Question ${idx + 1} of ${quizData.length}`;
+      updateScoreDisplay();
+    }
+
+    function selectAnswer(qIdx, oIdx) {
+      userAnswers[qIdx] = oIdx;
+      renderQuestion(qIdx);
+    }
+
+    function navigateQuiz(dir) {
+      currentQuestionIdx += dir;
+      renderQuestion(currentQuestionIdx);
+    }
+
+    function updateScoreDisplay() {
+      let score = userAnswers.reduce((acc, ans, idx) => {
+        return ans === quizData[idx].correct ? acc + 1 : acc;
+      }, 0);
+      document.getElementById('scoreDisplay').innerText = `Score: ${score} / ${quizData.length}`;
+    }
+
+    renderQuestion(0);
+  </script>
+</body>
+</html>
